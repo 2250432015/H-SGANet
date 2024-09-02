@@ -15,3 +15,7 @@ Activate the newly created environment
 ```bash
 conda activate <environment_name>
 ```
+
+```bash
+python train_model.py
+```
