@@ -92,16 +92,17 @@ class model(nn.Module):
                                 nn.Conv3d(32, 32, 3, 1, 1, bias=False),
                                 nn.LeakyReLU(inplace=True),
                                 nn.InstanceNorm3d(32))
-        self.c5 = nn.Sequential(nn.Conv3d(32, 32, 3, 1, 1, bias=False),
-                                nn.LeakyReLU(inplace=True),
-                                nn.InstanceNorm3d(32))
 
         self.up1 = DecoderBlock(32, 16, 16, use_batchnorm=False)
         self.up2 = DecoderBlock(32, 32, 32, use_batchnorm=False)
         self.up3 = DecoderBlock(32, 32, 32, use_batchnorm=False)
         self.up4 = DecoderBlock(32, 32, 32, use_batchnorm=False)
 
-        self.vig = Vig(32)
+        self.vig1 = Vig(32)
+        self.vig2 = Vig(32)
+        self.vig3 = Vig(32)
+        self.vig4 = Vig(32)
+
         self.ssa = MobileViTv2Attention(d_model=28)
 
         self.reg_head = RegistrationHead(
@@ -114,23 +115,31 @@ class model(nn.Module):
     def forward(self, x):
         source = x[:, 0:1, :, :, :]
         cx = x.clone()
+        
         f1 = self.c1(cx)
-        x = f2 = self.c2(f1)
-        fvig = self.vig(x)
-        x = x + fvig
-        # f2 = self.c2(f1)
+        fvig1 = self.vig1(f1)  
+        x = f1 + fvig1 
+
+        f2 = self.c2(x)
+        fvig2 = self.vig2(f2) 
+        x = f2 + fvig2  
+
         f3 = self.c3(x)
+        fvig3 = self.vig3(f3)  
+        x = f3 + fvig3  
+
         f4 = self.c4(f3)
-        x = self.c5(f4)
-        # fvig = self.vig(x)
-        # x = x + fvig
+        fvig4 = self.vig4(f4) 
+        x = f4 + fvig4  
+
         fssa = self.ssa(x)
-        x = x + fssa
+        x = x + fssa  
 
         x = self.up4(x, f4)
         x = self.up3(x, f3)
         x = self.up2(x, f2)
         x = self.up1(x, f1, False)
+
         flow = self.reg_head(x)
         output = self.spatial_trans(source, flow)
         return output, flow
