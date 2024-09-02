@@ -3,7 +3,7 @@ import time
 import os
 import glob
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import torch
 import warnings
 import argparse
@@ -17,10 +17,10 @@ from thop import clever_format
 
 parser = argparse.ArgumentParser(description='param')
 parser.add_argument('--img_dir',
-                    default="/public/wlj/datasets/Brain_MRI/affine_img_ordered/", type=str)
+                    default="data_dir/", type=str)
 parser.add_argument('--seg_dir',
-                    default="/public/wlj/datasets/Brain_MRI/affine_seg_ordered/", type=str)
-parser.add_argument('--GPU_id', default='2', type=str)
+                    default="data_dir/", type=str)
+parser.add_argument('--GPU_id', default='0', type=str)
 parser.add_argument('--batch_size', default=1, type=int)
 parser.add_argument('--reproducible_seed', default=None)
 parser.add_argument('--lr', default=0.0001, type=float)

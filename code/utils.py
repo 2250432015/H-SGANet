@@ -96,6 +96,7 @@ def jacobian_determinant_vxm(disp):
               where vol_shape is of len nb_dims
     Returns:
         jacobian determinant (scalar)
+        
     """
 
     # check inputs
